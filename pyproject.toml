@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "pytorch_object_centric_learning_with_slot_attention"
+version = "0.1.0"
+description = "PyTorch implementation of \"Object-Centric Learning with Slot Attention\""
+authors = ["Bryden Fogelman <bryden1995@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "3.8"
+torch = "1.7.1"
+torchvision = "0.8.2"
+wandb = "0.10.13"
+attrs = "20.3.0"
+Pillow = "8.1.0"
+numpy = "1.19.5"
+pytorch-lightning = "1.1.4"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
