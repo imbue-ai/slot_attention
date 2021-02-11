@@ -1,10 +1,8 @@
-import json
 from typing import Optional
 
 import pytorch_lightning.loggers as pl_loggers
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import LearningRateMonitor
-from pytorch_lightning.callbacks import ModelCheckpoint
 from torchvision import transforms
 
 from slot_attention.data import CLEVRDataModule
@@ -47,6 +45,8 @@ def main(params: Optional[SlotAttentionParams] = None):
         num_workers=params.num_workers,
     )
 
+    print(f"Training set size (images must have {params.num_slots - 1} objects):", len(clevr_datamodule.train_dataset))
+
     model = SlotAttentionModel(
         resolution=params.resolution,
         num_slots=params.num_slots,
@@ -58,13 +58,6 @@ def main(params: Optional[SlotAttentionParams] = None):
 
     logger_name = "slot-attention-clevr6"
     logger = pl_loggers.WandbLogger(project="slot-attention-clevr6", name=logger_name)
-    model_checkpoint = ModelCheckpoint(
-        dirpath="./best_checkpoints",
-        monitor="avg_val_loss",
-        filename="slot-attention-{epoch:02d}-{val_loss:.2f}",
-        save_top_k=1,
-        save_last=True,
-    )
 
     trainer = Trainer(
         logger=logger if params.is_logger_enabled else False,
@@ -72,21 +65,10 @@ def main(params: Optional[SlotAttentionParams] = None):
         num_sanity_val_steps=params.num_sanity_val_steps,
         gpus=params.gpus,
         max_epochs=params.max_epochs,
-        callbacks=[model_checkpoint, LearningRateMonitor("step"), ImageLogCallback(),]
-        if params.is_logger_enabled
-        else [],
+        log_every_n_steps=50,
+        callbacks=[LearningRateMonitor("step"), ImageLogCallback(),] if params.is_logger_enabled else [],
     )
     trainer.fit(method)
-
-    json.dump(
-        {
-            "best_model_path": model_checkpoint.best_model_path,
-            "best_model_score": model_checkpoint.best_model_score.item()
-            if model_checkpoint.best_model_score
-            else None,
-        },
-        open("checkpoint_details.json", "w"),
-    )
 
 
 if __name__ == "__main__":

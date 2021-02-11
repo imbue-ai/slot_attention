@@ -3,10 +3,8 @@ from typing import Tuple
 from typing import TypeVar
 from typing import Union
 
-import numpy as np
 import torch
 from pytorch_lightning import Callback
-from torchvision.transforms import transforms
 
 import wandb
 
@@ -51,43 +49,16 @@ def only(x):
     return materialized_x[0]
 
 
-class CoordConv(object):
-    def __call__(self, tensor):
-        c, H, W = tensor.shape
-
-        x = np.linspace(-1, 1, W)
-        y = np.linspace(-1, 1, H)
-
-        xx, yy = np.meshgrid(x, y)
-
-        return torch.cat([tensor, torch.FloatTensor(xx).unsqueeze(0), torch.FloatTensor(yy).unsqueeze(0)], dim=0)
-
-
-class ClampImage(object):
-    def __call__(self, tensor):
-        tensor = tensor.clone()
-        img_min = float(tensor.min())
-        img_max = float(tensor.max())
-        tensor.clamp_(min=img_min, max=img_max)
-        tensor.add_(-img_min).div_(img_max - img_min + 1e-5)
-        return tensor
-
-
-class ToImage:
-    def __init__(self):
-        self.transforms = transforms.Compose([ClampImage(), transforms.ToPILImage()])
-
-    def __call__(self, inputs):
-        return self.transforms(inputs)
-
-
 class ImageLogCallback(Callback):
     def on_validation_epoch_end(self, trainer, pl_module):
         """Called when the train epoch ends."""
 
-        with torch.no_grad():
-            pl_module.eval()
-            images = pl_module.sample_images()
-
         if trainer.logger:
-            trainer.logger.experiment.log({"images": [wandb.Image(images)]})
+            with torch.no_grad():
+                pl_module.eval()
+                images = pl_module.sample_images()
+                trainer.logger.experiment.log({"images": [wandb.Image(images)]}, commit=False)
+
+
+def to_rgb_from_tensor(x: Tensor):
+    return (x * 0.5 + 0.5).clamp(0, 1)

@@ -25,13 +25,6 @@ class SlotAttention(nn.Module):
         self.norm_slots = nn.LayerNorm(self.slot_size)
         self.norm_mlp = nn.LayerNorm(self.slot_size)
 
-        # self.slots_mu = nn.init.xavier_uniform_(
-        #     torch.zeros((1, 1, self.slot_size)), gain=nn.init.calculate_gain("linear")
-        # )
-        # self.slots_log_sigma = nn.init.xavier_uniform_(
-        #     torch.zeros((1, 1, self.slot_size)), gain=nn.init.calculate_gain("linear")
-        # )
-
         # Linear maps for the attention module.
         self.project_q = nn.Linear(self.slot_size, self.slot_size, bias=False)
         self.project_k = nn.Linear(self.slot_size, self.slot_size, bias=False)
@@ -53,7 +46,6 @@ class SlotAttention(nn.Module):
             "slots_log_sigma",
             nn.init.xavier_uniform_(torch.zeros((1, 1, self.slot_size)), gain=nn.init.calculate_gain("linear")),
         )
-        # self.register_buffer("slots_init", torch.zeros((1, self.num_slots, self.slot_size)))
 
     def forward(self, inputs: Tensor):
         # `inputs` has shape [batch_size, num_inputs, inputs_size].
