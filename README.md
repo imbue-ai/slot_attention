@@ -2,7 +2,7 @@
 
 This is a re-implementation of "Object-Centric Learning with Slot Attention" in PyTorch (https://arxiv.org/abs/2006.15055).
 
-![dsafdsa](./slot_attention_results.png)
+![Outputs of our slot attention model. This image demonstrates the models ability to divide objects (or parts of objects) into slots.](./slot_attention_results.png)
 
 ## Requirements
 
