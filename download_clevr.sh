@@ -4,13 +4,13 @@ set -x
 
 DATA_DIR=/tmp/data
 
-if [ -f $DATA_DIR ]; then
+if [ ! -d $DATA_DIR ]; then
     mkdir $DATA_DIR
 fi
 
 cd $DATA_DIR
 
-if [ -f "$DATA_DIR/CLEVR_v1.0.zip.*" ]; then
+if [ ! -f "$DATA_DIR/CLEVR_v1.0.zip.*" ]; then
     wget https://dl.fbaipublicfiles.com/clevr/CLEVR_v1.0.zip
     echo "CLEVR_v1 downloaded to $DATA_DIR/CLEVR_v1.0.zip"
 else
