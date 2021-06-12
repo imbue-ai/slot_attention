@@ -27,8 +27,8 @@ class SlotAttention(nn.Module):
 
         # Linear maps for the attention module.
         self.project_q = nn.Linear(self.slot_size, self.slot_size, bias=False)
-        self.project_k = nn.Linear(self.slot_size, self.slot_size, bias=False)
-        self.project_v = nn.Linear(self.slot_size, self.slot_size, bias=False)
+        self.project_k = nn.Linear(self.in_features, self.slot_size, bias=False)
+        self.project_v = nn.Linear(self.in_features, self.slot_size, bias=False)
 
         # Slot update functions.
         self.gru = nn.GRUCell(self.slot_size, self.slot_size)
